@@ -1,13 +1,33 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\UserController;
+use App\Models\CompanyCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::prefix('auths')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
 
-Route::post('/register', [AuthController::class, 'register']);
+    Route::get("/roles", [AuthController::class, "getRoles"]);
+});
 
-Route::post('/login', [AuthController::class, 'login']);
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::prefix('companies')->group(function () {
+        Route::get("/subscriptions", [CompanyController::class, "getSubscriptions"]);
+        Route::get("/categories", [CompanyController::class, "getCategories"]);
+
+        Route::post("/create-company", [CompanyController::class, "createCompany"]);
+
+        Route::get("/user-companies", [CompanyController::class, "getCompanyByIdUser"]);
+        Route::get("/company-users/{id}", [CompanyController::class, "getUsersByCompany"]);
+    });
+});
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::prefix('users')->group(function () {
+        Route::get("/activities", [UserController::class, "getActivities"]);
+    });
+});

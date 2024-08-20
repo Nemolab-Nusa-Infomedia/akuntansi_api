@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('companies', function (Blueprint $table) {
-            $table->id();
+            $table->uuid("id")->primary();
             $table->foreignId('category_id')->constrained('company_categories')->onDelete('cascade');
             $table->uuid('subscription_id'); // Ganti foreignId dengan uuid
             $table->foreign('subscription_id')->references('id')->on('subscriptions')->onDelete('cascade');
@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('location', 100);
             $table->dateTime('sub_from');
             $table->dateTime('sub_to');
+            $table->enum("status", ["active", 'disabled']);
             $table->timestamps();
         });
     }

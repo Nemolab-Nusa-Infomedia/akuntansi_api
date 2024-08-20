@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -54,7 +55,6 @@ class AuthController extends Controller
             "role_id" => "required|integer",
             "email" => "required|string|email:dns|unique:users",
             "phone" => "required",
-            "status_account" => "required|in:active,disable",
             "password" => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -74,7 +74,7 @@ class AuthController extends Controller
                     'role_id' => $data['role_id'],
                     'email' => $data['email'],
                     'phone' => $data['phone'],
-                    'status_accont' => $data['status_account'],
+                    'status_accont' => "active",
                     'password' => $data['password'],
                 ]);
                 return response()->json([
@@ -89,6 +89,26 @@ class AuthController extends Controller
                     'data' => null
                 ], 500);
             }
+        }
+    }
+
+    public function getRoles(Request $request)
+    {
+        try {
+            $roles = Role::get();
+
+            return response()->json([
+                'code' => 200,
+                'message' => "Success get data roles.",
+                'data' => [
+                    "roles" => $roles
+                ]
+            ], 500);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'code' => 500,
+                'message' => $th->getMessage(),
+            ], 500);
         }
     }
 }
