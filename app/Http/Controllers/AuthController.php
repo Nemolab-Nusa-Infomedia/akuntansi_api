@@ -60,7 +60,7 @@ class AuthController extends Controller
 
         if ($validate->fails()) {
             return response()->json([
-                'code' => 400,
+                'status' => 400,
                 'message' => $validate->errors(),
                 'data' => null
             ], 400);
@@ -78,13 +78,13 @@ class AuthController extends Controller
                     'password' => $data['password'],
                 ]);
                 return response()->json([
-                    'code' => 200,
+                    'status' => 200,
                     'message' => 'Register successfull',
                     'data' => $user
                 ]);
             } catch (\Throwable $th) {
                 return response()->json([
-                    'code' => 500,
+                    'status' => 500,
                     'message' => $th->getMessage(),
                     'data' => null
                 ], 500);
@@ -98,7 +98,7 @@ class AuthController extends Controller
             $roles = Role::get();
 
             return response()->json([
-                'code' => 200,
+                'status' => 200,
                 'message' => "Success get data roles.",
                 'data' => [
                     "roles" => $roles
@@ -106,7 +106,7 @@ class AuthController extends Controller
             ], 500);
         } catch (\Throwable $th) {
             return response()->json([
-                'code' => 500,
+                'status' => 500,
                 'message' => $th->getMessage(),
             ], 500);
         }

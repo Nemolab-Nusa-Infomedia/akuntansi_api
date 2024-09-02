@@ -61,4 +61,12 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Company::class, "user_companies", "user_id");
     }
+
+    public function isSuperAdmin(){
+        return $this->role->contains('id', 1);
+    }
+
+    public function isAdmin(){
+        return $this->role->contains('id', 2);
+    }
 }
