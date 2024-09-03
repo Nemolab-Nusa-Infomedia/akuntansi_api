@@ -29,5 +29,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('users')->group(function () {
         Route::get("/activities", [UserController::class, "getActivities"]);
+
+        Route::post('/create/vendor', [UserController::class, 'createVendor'])->middleware('isSuperAdmin');
     });
 });
