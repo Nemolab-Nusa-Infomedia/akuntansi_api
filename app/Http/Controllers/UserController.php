@@ -8,6 +8,7 @@ use App\Models\LogActivity;
 use App\Models\PaymentSubscription;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Models\UserCompany;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -41,12 +42,11 @@ class UserController extends Controller
 
         $validate = Validator::make($request->all(), [
             'subscription_id' => 'required|string',
-            'role_id' => 'required|integer',
             'name' => 'required|string',
             'email' => 'required|string|email:dns|unique:users',
             "phone" => "required",
             "password" => ['required', 'confirmed', Rules\Password::defaults()],
-            'category_id' => 'required|integer',
+            'company_category_id' => 'required|integer',
             'name_company' => 'required|string',
             'location' => 'required|string',
         ]);
@@ -69,7 +69,7 @@ class UserController extends Controller
                 $data['password'] = Hash::make($data['password']);
                 $user = User::create([
                     'name' => $data['name'],
-                    'role_id' => $data['role_id'],
+                    'role_id' => 3,
                     'email' => $data['email'],
                     'phone' => $data['phone'],
                     'status_accont' => "active",
@@ -78,7 +78,7 @@ class UserController extends Controller
 
                 // Create new company
                 $company = Company::create([
-                    'category_id' => $data['category_id'],
+                    'company_category_id' => $data['company_category_id'],
                     'subscription_id' => $data['subscription_id'],
                     'name' => $data['name_company'],
                     'location' => $data['location'],
@@ -95,11 +95,71 @@ class UserController extends Controller
                     'subscription_id' => $subs->id,
                 ]);
 
+                UserCompany::create([
+                    'role' => 'owner',
+                    'user_id' => $user->id,
+                    'company_id' => $company->id
+                ]);
+
                 DB::commit();
 
                 return response()->json([
                     'status' => 200,
                     'message' => 'Vendor has been created',
+                    'data' => $create
+                ]);
+
+            }
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'message' => $th->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function createUserCompany(Request $request){
+        $validate = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'email' => 'required|string|email:dns|unique:users',
+            "phone" => "required",
+            "password" => ['required', 'confirmed', Rules\Password::defaults()],
+            "company_id" => 'required|string',
+        ]);
+
+        try {
+            if($validate->fails()){
+                return response()->json([
+                    'status' => 400,
+                    'message' => $validate->errors()
+                ], 400);
+            } else {
+                DB::beginTransaction();
+                $data = $validate->validated();
+
+                // Create new user
+                $data['password'] = Hash::make($data['password']);
+                $user = User::create([
+                    'name' => $data['name'],
+                    'role_id' => 3,
+                    'email' => $data['email'],
+                    'phone' => $data['phone'],
+                    'status_accont' => "active",
+                    'password' => $data['password'],
+                ]);
+
+                $create = UserCompany::create([
+                    'role' => 'member',
+                    'user_id' => $user->id,
+                    'company_id' => $data['company_id']
+                ]);
+
+                DB::commit();
+
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'User created',
                     'data' => $create
                 ]);
 

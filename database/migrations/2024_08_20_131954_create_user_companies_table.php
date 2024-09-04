@@ -15,7 +15,9 @@ return new class extends Migration
             $table->uuid("id")->primary();
             $table->enum("role", ["owner", "member"]);
             $table->uuid('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->uuid('company_id');
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
             $table->timestamps();
         });
     }

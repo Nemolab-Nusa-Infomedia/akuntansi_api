@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->unsignedBigInteger('role_id')->comment('1:superadmin, 2:admin');
+            $table->unsignedBigInteger('role_id')->comment('1:superadmin, 2:admin, 3:user');
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
             $table->string('name');
             $table->string('email')->unique();

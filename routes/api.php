@@ -30,6 +30,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('users')->group(function () {
         Route::get("/activities", [UserController::class, "getActivities"]);
 
+        // Khusus superadmin untuk membuat account user yang pesan paket jurnal
         Route::post('/create/vendor', [UserController::class, 'createVendor'])->middleware('isSuperAdmin');
+
+        // Khusus pemilik company yang ingin menambahkan anggota
+        Route::post('/company/account', [UserController::class, 'createUserCompany']);
     });
 });

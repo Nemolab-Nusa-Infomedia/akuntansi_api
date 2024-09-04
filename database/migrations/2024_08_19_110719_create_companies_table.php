@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->uuid("id")->primary();
-            $table->foreignId('category_id')->constrained('company_categories')->onDelete('cascade');
+            $table->foreignId('company_category_id')->constrained('company_categories')->onDelete('cascade');
             $table->uuid('subscription_id'); // Ganti foreignId dengan uuid
             $table->foreign('subscription_id')->references('id')->on('subscriptions')->onDelete('cascade');
             $table->string('name', 100);

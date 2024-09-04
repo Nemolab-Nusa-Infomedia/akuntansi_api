@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\OwnerCompanyMiddleware;
 use App\Http\Middleware\SuperAdminMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -16,7 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'isAdmin' => AdminMiddleware::class,
-            'isSuperAdmin' => SuperAdminMiddleware::class
+            'isSuperAdmin' => SuperAdminMiddleware::class,
+            'isOwnerCompany' => OwnerCompanyMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

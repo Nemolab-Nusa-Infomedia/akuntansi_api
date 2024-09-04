@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -67,8 +68,16 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id');
     }
 
+    public function user_company(): HasOne {
+        return $this->hasOne(UserCompany::class, 'user_id');
+    }
+
     public function isSuperAdmin(){
         return $this->role->id == 1;
+    }
+
+    public function isOwnerCompany(){
+        return $this->user_company != null && $this->user_company->role == 'owner';
     }
 
     public function isAdmin(){
