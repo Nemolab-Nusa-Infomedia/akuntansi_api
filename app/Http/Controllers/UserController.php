@@ -10,7 +10,9 @@ use App\Models\Subscription;
 use App\Models\User;
 use App\Models\UserCompany;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -18,6 +20,61 @@ use Illuminate\Validation\Rules;
 
 class UserController extends Controller
 {
+    public function transferOwnerRole(Request $request){
+        $validate = Validator::make($request->all(), [
+            'company_id' => 'required|string',
+            'user_id' => 'required|string'
+        ]);
+
+        try {
+            if($validate->fails()){
+                return response()->json([
+                    'status' => 400,
+                    'message' => $validate->errors()
+                ], 400);
+            } else {
+
+                DB::beginTransaction();
+                $data = $validate->validated();
+
+                $user = Auth::user();
+
+                if(!Gate::forUser($user)->allows('transfer-owner', $data['company_id'])){
+                    return response()->json([
+                        'status' => 401,
+                        'message' => 'Unauthorization'
+                    ]);
+                }
+
+                $user2_company = UserCompany::where('user_id', $data['user_id'])->where('company_id', $data['company_id'])->first();
+
+                $user1_company = $user->user_company->where('company_id', $data['company_id'])->first();
+
+                $user1_company->update([
+                    'role' => 'member'
+                ]);
+
+                $user2_company->update([
+                    'role' => 'owner'
+                ]);
+
+                DB::commit();
+
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Transfer role owner berhasil'
+                ]);
+
+            }
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'message' => $th->getMessage(),
+            ], 500);
+        }
+    }
+
     public function getActivities(Request $request)
     {
         try {

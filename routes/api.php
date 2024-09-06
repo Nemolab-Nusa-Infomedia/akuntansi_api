@@ -3,8 +3,6 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\UserController;
-use App\Models\CompanyCategory;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auths')->group(function () {
@@ -34,6 +32,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/create/vendor', [UserController::class, 'createVendor'])->middleware('isSuperAdmin');
 
         // Khusus pemilik company yang ingin menambahkan anggota
-        Route::post('/company/account', [UserController::class, 'createUserCompany']);
+        Route::post('/company/account', [UserController::class, 'createUserCompany'])->middleware('isOwnerCompany');
+
+        Route::post('/transfer/owner', [UserController::class, 'transferOwnerRole'])->middleware('isOwnerCompany');
     });
 });

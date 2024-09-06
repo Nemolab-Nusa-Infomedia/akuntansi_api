@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -68,8 +69,8 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id');
     }
 
-    public function user_company(): HasOne {
-        return $this->hasOne(UserCompany::class, 'user_id');
+    public function user_company(): HasMany {
+        return $this->hasMany(UserCompany::class, 'user_id');
     }
 
     public function isSuperAdmin(){
@@ -77,7 +78,7 @@ class User extends Authenticatable
     }
 
     public function isOwnerCompany(){
-        return $this->user_company != null && $this->user_company->role == 'owner';
+        return $this->user_company != null && $this->user_company->contains('role', 'owner');
     }
 
     public function isAdmin(){
